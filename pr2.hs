@@ -12,7 +12,7 @@ mezclar :: Color -> Color -> Color
 
 mezclar (Col x y z) (Col w e r) = (Col ((x + w) / 2) ((y + e) / 2) ((z + r) / 2))
 
-
+ 
 
 
 ------------------------------------------------------------------------------------
@@ -43,20 +43,177 @@ mezclar (Col x y z) (Col w e r) = (Col ((x + w) / 2) ((y + e) / 2) ((z + r) / 2)
 
 --Definir un tipo de datos Lı́nea e implementar las operaciones dadas.
 
-data Linea = Ch Char (Linea) | P (Linea)(Linea) | EmptyC deriving Show
+data Linea = Ch Char Int (Linea) | EmptyC deriving Show
 -- d a s 'P' t y f
 
-l1 = Ch 'd' (Ch 'a' (Ch 's' (Ch 't' (EmptyC))))
- 
+r1 = Ch 'd' 0 (Ch 'a' 1 (Ch 's' 0 ( Ch 't' 0 (EmptyC)))) 
 
 vacia :: Linea
-
 vacia = EmptyC
 
 
 moverIzq :: Linea -> Linea
 
-moverIzq (Ch c xs) = Ch c EmptyC
+moverIzq (Ch x i (Ch y 1 xs)) = Ch x 1 (Ch y 0 xs) 
+
+moverIzq (Ch x i xs) 
+ 
+ | i == 1    = Ch x i xs
+ | otherwise = Ch x i (moverIzq xs)
+
+
+moverDer :: Linea -> Linea
+
+moverDer (Ch x 1 (EmptyC)) = (Ch x 1 (EmptyC)) 
+
+moverDer (Ch x 1 (Ch y i ys)) = (Ch x 0 (Ch y 1 ys)) 
+
+moverDer (Ch x i xs) = Ch x i (moverDer xs)
+ 
+
+moverIni :: Linea -> Linea
+
+helpr EmptyC = EmptyC -- otra manera de hacerlo sin esta funcion ?
+
+helpr (Ch x i xs) = Ch x 0 ( helpr xs) 
+
+moverIni EmptyC = EmptyC
+
+moverIni (Ch x i xs) = Ch x 1 (helpr xs)
+
+
+moverFin :: Linea -> Linea
+
+moverFin (Ch x i EmptyC) = (Ch x 1 EmptyC)
+
+moverFin (Ch x i xs) = Ch x 0 (moverFin xs) 
+
+
+insertar :: Char -> Linea -> Linea
+
+insertar c (Ch x i xs) 
+ 
+ | i == 1    = Ch x 0 ( Ch c 1 xs ) 
+ | otherwise = Ch x i (insertar c xs)    
+
+
+borrar :: Linea -> Linea 
+
+borrar (Ch x i xs)
+
+ | i == 1    = Ch '-' i xs
+ | otherwise = Ch x i (borrar xs)  
+
+
+
+
+------------------------------------------------------------------------------------
+
+-- 3. Dado el tipo de datos
+-- data CList a = EmptyCL | CUnit a | Consnoc a (CList a) a
+-- 2 (4  (65  23) 11)  5 
+-- a) Implementar las operaciones de este tipo algebraico teniendo en cuenta que:
+-- Las funciones de acceso son headCL, tailCL, isEmptyCL,isCUnit.
+
+-- headCL y tailCL no están definidos para una lista vacı́a.
+-- headCL toma una CList y devuelve el primer elemento de la misma (el de más a la izquierda).
+-- tailCL toma una CList y devuelve la misma sin el primer elemento.
+-- isEmptyCL aplicado a una CList devuelve True si la CList es vacı́a (EmptyCL) o False
+-- en caso contrario.
+-- isCUnit aplicado a una CList devuelve True sii la CList tiene un solo elemento (CUnit a)
+-- o False en caso contrario.
+
+data CList a = EmptyCL | CUnit a | Consnoc a (CList a) a deriving (Show , Eq)
+
+li1 = Consnoc 2 (Consnoc 4 (Consnoc 65 (EmptyCL) 23) 11) 5
+
+-- li1 = Consnoc 4 (Consnoc 65 (Consnoc  (EmptyCL) 23) 11) 5
+
+
+
+headCL :: CList a -> a
+
+headCL EmptyCL = error "la funcion no esta definida con una lista vacia"
+
+headCL (CUnit x) = x
+
+headCL (Consnoc x (xs) y) = x
+
+
+
+tailHlpr (Consnoc x EmptyCL y) i = (Consnoc x (CUnit i) y)
+
+tailHlpr (Consnoc x (xs) y) i = (Consnoc x (tailHlpr xs i) y) 
+
+tailCL :: CList a -> CList a
+
+tailCL EmptyCL = error "la funcion no esta definida con una lista vacia"
+
+tailCL (CUnit a) = EmptyCL
+
+tailCL (Consnoc x (Consnoc w (xs) z) y) = (Consnoc w (tailHlpr xs y) z )
+
+
+
+isEmptyCL :: CList a -> Bool
+
+isEmptyCL EmptyCL = True
+
+isEmptyCL (CUnit _) = False
+
+isEmptyCL (Consnoc _ _ _) = False
+	
+
+
+isCUnit :: CList a -> Bool
+
+isCUnit EmptyCL = False
+
+isCUnit (CUnit _) = True
+
+isCUnit (Consnoc _ _ _) = False
+
+
+			
+-- b) Definir una función reverseCL que toma una CList y devuelve su inversa.
+-- 2 (4  (65  23) 11) 5  -->>  65 (4  (2  5) 11) 23
+
+--       (2 5) 
+--     4 (2 5) 11
+-- 65 (4 (2 5) 11) 23
+
+rvHlp x xs y = Consnoc x (EmptyCL) y 
+
+reverseCL :: CList a -> CList a
+
+reverseCL EmptyCL = EmptyCL
+
+reverseCL (CUnit x) = (CUnit x) 
+
+--reverseCL (Consnoc x EmptyCL y) = (Consnoc x EmptyCL y)
+
+reverseCL (Consnoc x xs y) =  (Consnoc (headCL xs) EmptyCL (headCL xs))
+
+
+
+
+
+
+
+--c) Definir una función inits que toma una CList y devuelve una CList con todos los posibles
+--   inicios de la CList.
+
+--d) Definir una función lasts que toma una CList y devuelve una CList con todas las posibles
+--   terminaciones de la CList.
+
+--e) Definir una función concatCL que toma una CList de CList y devuelve la CList con todas ellas
+--   concatenadas
+
+
+
+
+
+
 
 
 
