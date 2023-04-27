@@ -130,7 +130,6 @@ li1 = Consnoc 2 (Consnoc 4 (Consnoc 65 (EmptyCL) 23) 11) 5
 -- li1 = Consnoc 4 (Consnoc 65 (Consnoc  (EmptyCL) 23) 11) 5
 
 
-
 headCL :: CList a -> a
 
 headCL EmptyCL = error "la funcion no esta definida con una lista vacia"
@@ -182,7 +181,29 @@ isCUnit (Consnoc _ _ _) = False
 --     4 (2 5) 11
 -- 65 (4 (2 5) 11) 23
 
-rvHlp x xs y = Consnoc x (EmptyCL) y 
+-- toma el 1er elem del ultimo Cosnoc
+fstCL EmptyC = EmptyC
+
+fstCL (Consnoc x EmptyCL y) = x
+
+fstCL (Consnoc x xs y) = fstCL xs
+
+-- toma el 2do elem del ultimo Cosnoc
+lastCL EmptyC = EmptyC
+
+lastCL (Consnoc x EmptyCL y) = y
+
+lastCL (Consnoc x xs y) = lastCL xs 
+
+
+-- elimina el ultimo Consnoc de la clist, para poner como nuevo "ultimo" Consnoc, el Consnoc anteultimo.
+lessCL EmptyCL = EmptyCL
+
+lessCL (Consnoc x (Consnoc w EmptyCL z) y) = (Consnoc x EmptyCL y)
+
+lessCL (Consnoc x xs y) = (Consnoc x (lessCL xs) y)
+
+
 
 reverseCL :: CList a -> CList a
 
@@ -190,35 +211,25 @@ reverseCL EmptyCL = EmptyCL
 
 reverseCL (CUnit x) = (CUnit x) 
 
---reverseCL (Consnoc x EmptyCL y) = (Consnoc x EmptyCL y)
+reverseCL (Consnoc x EmptyCL y) = (Consnoc x EmptyCL y)
 
-reverseCL (Consnoc x xs y) =  (Consnoc (headCL xs) EmptyCL (headCL xs))
-
-
-
+reverseCL (Consnoc x xs y) = (Consnoc (fstCL xs) (reverseCL (lessCL (Consnoc x xs y))) (lastCL xs)) 
 
 
 
 
 --c) Definir una función inits que toma una CList y devuelve una CList con todos los posibles
---   inicios de la CList.
+--   inicios de la CList. 
+-- tomo de 1 a 6
+
+inits EmptyCL = isEmptyCL
+
+inits (Consnoc x xs y) 
+
+
 
 --d) Definir una función lasts que toma una CList y devuelve una CList con todas las posibles
 --   terminaciones de la CList.
 
 --e) Definir una función concatCL que toma una CList de CList y devuelve la CList con todas ellas
 --   concatenadas
-
-
-
-
-
-
-
-
-
-
-
-
-
-
