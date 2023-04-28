@@ -182,14 +182,14 @@ isCUnit (Consnoc _ _ _) = False
 -- 65 (4 (2 5) 11) 23
 
 -- toma el 1er elem del ultimo Cosnoc
-fstCL EmptyC = EmptyC
+fstCL EmptyCL = error "Clist vacia"
 
 fstCL (Consnoc x EmptyCL y) = x
 
 fstCL (Consnoc x xs y) = fstCL xs
 
 -- toma el 2do elem del ultimo Cosnoc
-lastCL EmptyC = EmptyC
+lastCL EmptyCL = error "Clist vacia"
 
 lastCL (Consnoc x EmptyCL y) = y
 
@@ -219,12 +219,14 @@ reverseCL (Consnoc x xs y) = (Consnoc (fstCL xs) (reverseCL (lessCL (Consnoc x x
 
 
 --c) Definir una función inits que toma una CList y devuelve una CList con todos los posibles
---   inicios de la CList. 
--- tomo de 1 a 6
+--  inicios de la CList. 
 
-inits EmptyCL = isEmptyCL
+inits EmptyCL = EmptyCL
 
-inits (Consnoc x xs y) 
+inits (Consnoc x xs y) = (Consnoc x xs y)
+
+
+
 
 
 
